@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haiku & Image Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
+            margin: 0; /* Remove default margin */
+            padding: 40px 20px; /* Add padding for spacing from viewport edges */
+            background-color: #f0f2f5; /* Lighter, more modern background */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px 40px; /* Increased padding */
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* Softer, more modern shadow */
+            width: 80%;
+            max-width: 700px;
+            text-align: left; /* Default text align for container content */
+        }
+        h1 {
+            color: #2c3e50; /* Darker, modern heading color */
+            text-align: center;
+            margin-bottom: 30px; /* More space below heading */
+            font-size: 2.2em; /* Larger heading */
+            font-weight: 600;
+        }
+        form {
+            display: flex;
+            gap: 15px; /* Increased gap */
+            margin-bottom: 30px; /* More space below form */
+            align-items: center; /* Align items vertically */
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 15px; /* Increased padding */
+            border: 1px solid #ccc; /* Slightly darker border */
+            border-radius: 6px; /* More rounded */
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+        }
+        input[type="text"]:focus {
+            border-color: #007bff; /* Highlight color on focus */
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); /* Focus ring */
+            outline: none; /* Remove default outline */
+        }
+        input[type="submit"] {
+            padding: 12px 20px; /* Increased padding */
+            background-color: #007bff; /* Modern blue */
+            color: white;
+            border: none;
+            border-radius: 6px; /* More rounded */
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transitions */
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: translateY(-1px); /* Slight lift effect */
+        }
+        input[type="submit"]:active {
+            transform: translateY(0px); /* Press down effect */
+        }
+        .result {
+            margin-top: 30px;
+            border-top: 1px solid #e0e0e0; /* Lighter separator */
+            padding-top: 30px;
+            text-align: center;
+        }
+        .result h2 {
+            color: #34495e; /* Consistent modern heading color */
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        .haiku {
+            white-space: pre-wrap; /* Preserve line breaks in haiku */
+            background-color: #e6f7ff; /* Light blue background */
+            padding: 20px; /* Increased padding */
+            border-radius: 8px; /* More rounded */
+            border-left: 5px solid #007bff; /* Blue accent */
+            text-align: left; /* Align haiku text to the left for readability */
+            display: inline-block; /* To respect text-align: left within a centered parent */
+            margin-bottom: 20px; /* Space below haiku */
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .image-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        img {
+            max-width: 100%; /* Allow image to be responsive */
+            height: auto;
+            border-radius: 8px; /* More rounded */
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle shadow for image */
+        }
+        .error {
+            color: #721c24; /* Darker red for better contrast */
+            background-color: #f8d7da; /* Lighter red background */
+            border: 1px solid #f5c6cb; /* Border for error message */
+            padding: 15px; /* Increased padding */
+            border-radius: 6px;
+            margin-bottom: 20px; /* More space below error */
+            text-align: left;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 10px;
+            }
+            .container {
+                padding: 20px;
+                width: 95%;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            form {
+                flex-direction: column; /* Stack form elements vertically */
+                align-items: stretch; /* Make input and button full width */
+            }
+            input[type="text"] {
+                margin-bottom: 10px; /* Space between input and button when stacked */
+            }
+            .haiku {
+                padding: 15px;
+                font-size: 1em;
+            }
+            .result h2 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Haiku & Image Generator</h1>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('index') }}">
+            <input type="text" name="haiku_topic" placeholder="Enter topic for haiku (e.g., 'spring rain')" required
+                   value="{{ request.form.haiku_topic if request.form.haiku_topic else '' }}">
+            <input type="submit" value="Generate">
+        </form>
+
+            {% if haikuText and image_url %}
+                <div style="text-align: center; margin-top: 30px;"> <!-- Wrapper for centering and top margin -->
+                    <h2>Your Generated Haiku</h2> <!-- Will be centered by parent's text-align -->
+                    <img src="{{ image_url }}" alt="Haiku Image" style="max-width: 400px; display: block; margin: 0 auto 20px auto;"> <!-- Centered block with bottom margin -->
+                    <p class="haiku">{{ haikuText }}</p> <!-- Uses .haiku class for styling and alignment -->
+                </div>
+                <hr style="margin-top: 30px; margin-bottom: 30px;"> <!-- Separator with vertical spacing -->
+            {% endif %}
+
+            {% if recent_haikus %}
+                <h2>Recently Generated Haikus</h2>
+                <div class="haiku-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+                    {% for item in recent_haikus %}
+                        <div class="haiku-item" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                            <img src="{{ item.image_url }}" alt="Recent Haiku Image" style="max-width: 100%; height: auto; margin-bottom: 10px;">
+                            <p style="font-size: 0.9em; white-space: pre-wrap;">{{ item.text }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+    </div>
+</body>
+</html>
